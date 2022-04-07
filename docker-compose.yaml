@@ -26,3 +26,20 @@ services:
     volumes:
       - ./dockerfiles/squid/squid.conf:/etc/squid/squid.conf
     restart: unless-stopped
+  homebridge:
+    container_name: homebridge
+    image: oznu/homebridge:ubuntu
+    mem_limit: 187m
+    # network_mode: host
+    ports:
+      - "8581:8581/tcp"
+      - "8581:8581/udp"
+    environment:
+      PGID: '1000'
+      PUID: '1000'
+      HOMEBRIDGE_CONFIG_UI: '1'
+      HOMEBRIDGE_CONFIG_UI_PORT: '8581'
+      TZ: 'Europe/Vienna'
+    volumes:
+      - ./volumes/homebridge:/homebridge
+    restart: unless-stopped
