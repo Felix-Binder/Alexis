@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+  pihole:
+    container_name: pihole
+    build: ./dockerfiles/pihole/.
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "67:67/udp"
+      - "8080:80/tcp"
+    environment:
+      TZ: 'Europe/Vienna'
+      WEBPASSWORD: 'admin'
+    volumes:
+      - './volumes/pihole/etc-pihole:/etc/pihole'
+      - './volumes/pihole/etc-dnsmasq.d:/etc/dnsmasq.d'
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped
+  squid:
+    container_name: squid
+    build: ./dockerfiles/squid/.
+    ports:
+      - "3128:3128/tcp"
+      - "3128:3128/udp"
+    volumes:
+      - ./dockerfiles/squid/squid.conf:/etc/squid/squid.conf
+    restart: unless-stopped
