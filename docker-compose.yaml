@@ -1,51 +1,5 @@
-version: "3.9"
+version: "3"
 services:
-
-  pihole:
-    build: ./dockerfiles/pihole/.
-    ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "67:67/udp"
-      - "8080:80/tcp"
-    environment:
-      TZ: 'Europe/Vienna'
-      WEBPASSWORD: 'admin'
-    volumes:
-      - pihole_etc:/etc/pihole
-      - pihole_dns:/etc/dnsmasq.d
-    cap_add:
-      - NET_ADMIN
-    restart: unless-stopped
-
-  squid:
-    build: ./dockerfiles/squid/.
-    ports:
-      - "3128:3128/tcp"
-      - "3128:3128/udp"
-    volumes:
-      - squid:/etc/squid/squid.conf
-    restart: unless-stopped
-
-  memcached:
-    image: memcached:alpine
-    mem_limit: 256m
-    restart: unless-stopped
-
-  loki:
-    image: grafana/loki:latest
-    ports:
-      - "3100:3100/tcp"
-      - "3100:3100/udp"
-    command: -config.file=/etc/loki/local-config.yaml
-    restart: unless-stopped
-
-  promtail:
-    image: grafana/promtail:latest
-    volumes:
-      - /var/log:/var/log
-    command: -config.file=/etc/promtail/config.yml
-    restart: unless-stopped
 
   grafana:
     image: grafana/grafana:latest
@@ -54,8 +8,36 @@ services:
       - "3000:3000/udp"
     restart: unless-stopped
 
-volumes:
-  pihole_etc:
-  pihole_dns:
-  squid:
-  homebridge:
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090/tcp"
+      - "9090:9090/udp"
+    volumes:
+      - ./volumes/prometheus:/etc/prometheus
+    restart: unless-stopped
+
+  # pihole:
+  #   build: ./dockerfiles/pihole/.
+  #   ports:
+  #     - "53:53/tcp"
+  #     - "53:53/udp"
+  #     - "67:67/udp"
+  #     - "8080:80/tcp"
+  #   environment:
+  #     TZ: 'Europe/Vienna'
+  #     WEBPASSWORD: 'admin'
+  #   volumes:
+  #     - ./volumes/pihole/etc:/etc/pihole
+  #     - ./volumes/pihole/dns:/etc/dnsmasq.d
+  #   cap_add:
+  #     - NET_ADMIN
+  #   restart: unless-stopped
+
+  # loki:
+  #   image: grafana/loki:latest
+  #   ports:
+  #     - "3100:3100/tcp"
+  #     - "3100:3100/udp"
+  #   command: -config.file=/etc/loki/local-config.yaml
+  #   restart: unless-stopped
